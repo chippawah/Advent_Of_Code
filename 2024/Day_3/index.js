@@ -21,22 +21,14 @@ const getCommandInputArgs = (command) => {
 };
 
 const sumAllProducts = (commands) => {
-  console.log({ commands });
   let enabled = true;
   return commands.reduce((sum, command) => {
-    console.log({ enabled, sum, command });
     let newSum = sum;
-    if (command === DO) {
-      console.log("Enabling");
-      enabled = true;
-    } else if (command === DONT) {
-      console.log("Disabling");
-      enabled = false;
-    } else if (enabled) {
-      console.log("Enabdled and summing products");
+    if (command === DO) enabled = true;
+    else if (command === DONT) enabled = false;
+    else if (enabled) {
       const [a, b] = getCommandInputArgs(command);
       newSum += parseInt(a) * parseInt(b);
-      console.log({ newSum });
     }
     return newSum;
   }, 0);
@@ -44,13 +36,9 @@ const sumAllProducts = (commands) => {
 
 const main = async () => {
   const fileData = await readFile(`${__dirname}/input.txt`, "utf-8");
-  let total = 0;
   const commands = getCommands(fileData, mulCommandPatternWithSwitch);
-  const sumOfProducts = sumAllProducts(commands);
-  console.log({ sumOfProducts });
-  total += sumOfProducts;
+  const total = sumAllProducts(commands);
   console.log({ total });
-  console.log({ finalSum: total });
 };
 
 main().catch(console.error);
