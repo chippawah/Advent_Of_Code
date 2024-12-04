@@ -33,6 +33,7 @@ const main = async () => {
     // The usual grabbing of the file, reading, and splitting into rows
     const fileData = await readFile(`${__dirname}/input.txt`, "utf8");
     const rows = fileData.split("\n");
+    let unmodifiedSafeCount = 0;
     let safeCount = 0;
     // Go through each of the rows and determine if the row is safe and increment the safeCount
     for (const row of rows) {
@@ -40,6 +41,7 @@ const main = async () => {
       const isSafe = isRowSafe(formattedRow);
       if (isSafe) {
         safeCount++;
+        unmodifiedSafeCount++;
       } else {
         let isSafeAfterItemRemoval = false;
         for (const [index, value] of formattedRow.entries()) {
@@ -53,7 +55,7 @@ const main = async () => {
         }
       }
     }
-    console.log({ safeCount });
+    console.log({ safeCount, unmodifiedSafeCount });
   } catch (e) {
     console.error(e);
   }
