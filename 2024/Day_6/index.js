@@ -71,14 +71,26 @@ class LabMapNode {
       col: this.coordinates.col + directionSteps.get(direction).col,
     });
   }
-  traverse(direction, visited = new Set()) {
+  traverse({ direction, visited = new Set(), obstacles = new Map() }) {
     visited.add(this.coordinates);
     const neighbor = this.getNeighbor(direction);
-    if (neighbor === null) return visited.size;
+    // const jsonObstable = JSON.stringify({
+    //   ...neighbor?.coordinates,
+    //   direction,
+    // });
+    if (neighbor === null) return { visited, obstacles };
     if (neighbor.value === "#") {
-      return this.traverse(directionSteps.get(direction).next, visited);
+      // const obstacleAlreadyVisited = obstacles.get(jsonObstable);
+      // If we find this coordinate set and direction in the obsacles map then we can exit knowing we found a loop
+      // if (obstacleAlreadyVisited) return { visited, obstacles };
+      // obstacles.set(jsonObstable, true);
+      return this.traverse({
+        direction: directionSteps.get(direction).next,
+        visited,
+        obstacles,
+      });
     }
-    return neighbor.traverse(direction, visited);
+    return neighbor.traverse({ direction, visited, obstacles });
   }
 }
 
@@ -89,7 +101,8 @@ const solution = async (filename) => {
   // traverse north until node.getNeighbor(north) returns node with # or null
   // once either of those conditions are true go to the next direction and do it again
   const startingNode = labMap.getNodeAtCoordinates(labMap.guardAt);
-  console.log("Visited Count:", startingNode.traverse("NORTH"));
+  const { visited, obstacles } = startingNode.traverse({ direction: "NORTH" });
+  console.log("Visited Count:", visited.size);
 };
 
 (async () => {
