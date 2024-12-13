@@ -71,19 +71,18 @@ class LabMapNode {
       col: this.coordinates.col + directionSteps.get(direction).col,
     });
   }
-  traverse({ direction, visited = new Set(), obstacles = new Map() }) {
+  traverse({ direction, visited = new Set(), obstacles = {} }) {
     visited.add(this.coordinates);
     const neighbor = this.getNeighbor(direction);
-    // const jsonObstable = JSON.stringify({
-    //   ...neighbor?.coordinates,
-    //   direction,
-    // });
+    const jsonObstable = JSON.stringify({
+      ...neighbor?.coordinates,
+      direction,
+    });
     if (neighbor === null) return { visited, obstacles };
     if (neighbor.value === "#") {
-      // const obstacleAlreadyVisited = obstacles.get(jsonObstable);
       // If we find this coordinate set and direction in the obsacles map then we can exit knowing we found a loop
-      // if (obstacleAlreadyVisited) return { visited, obstacles };
-      // obstacles.set(jsonObstable, true);
+      if (obstacles[jsonObstable]) return { visited, obstacles };
+      obstacles[jsonObstable] = true;
       return this.traverse({
         direction: directionSteps.get(direction).next,
         visited,
