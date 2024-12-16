@@ -78,10 +78,11 @@ class LabMapNode {
       ...neighbor?.coordinates,
       direction,
     });
+    // Return because the guard has exited the map
     if (neighbor === null) return { visited, obstacles };
     if (neighbor.value === "#") {
       // If we find this coordinate set and direction in the obsacles map then we can exit knowing we found a loop
-      if (obstacles[jsonObstable]) return { visited, obstacles };
+      if (obstacles[jsonObstable]) return { visited, obstacles, loop: true };
       obstacles[jsonObstable] = true;
       return this.traverse({
         direction: directionSteps.get(direction).next,
@@ -96,15 +97,31 @@ class LabMapNode {
 const solution = async (filename) => {
   const input = await readFile(`${__dirname}/${filename}.txt`, "utf-8");
   const labMap = new LabMap({ input });
-  // start at the labMap.guardAt
-  // traverse north until node.getNeighbor(north) returns node with # or null
-  // once either of those conditions are true go to the next direction and do it again
   const startingNode = labMap.getNodeAtCoordinates(labMap.guardAt);
-  const { visited, obstacles } = startingNode.traverse({ direction: "NORTH" });
+  const { visited } = startingNode.traverse({ direction: "NORTH" });
   console.log("Visited Count:", visited.size);
+  console.time("adding new obstacles");
+  const newObstacles = [...visited].reduce(
+    (addedObstacles, coordinates, index) => {
+      if (index === 0) return addedObstacles;
+      const labMapNode = labMap.getNodeAtCoordinates(coordinates);
+      const prev = labMapNode.value;
+      labMapNode.value = "#";
+      // console.log({ labMapNode });
+      const { loop } = startingNode.traverse({ direction: "NORTH" });
+      if (loop) addedObstacles.add(labMapNode.coordinates);
+      labMapNode.value = prev;
+      return addedObstacles;
+    },
+    new Set()
+  );
+  console.log(`New obstacles to induce a loop: ${newObstacles.size}`);
+  console.timeEnd("adding new obstacles");
 };
 
 (async () => {
+  console.log("#### SAMPLE ####");
   await solution("sample_input");
+  console.log("\n#### ACTUAL ####");
   await solution("input");
 })();
