@@ -115,7 +115,7 @@ const solution = async (filename) => {
     },
     new Set()
   );
-  console.log(`New obstacles to induce a loop: ${newObstacles.size}`);
+  console.log("New obstacles to induce a loop", newObstacles.size);
   console.timeEnd("adding new obstacles");
 };
 
